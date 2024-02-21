@@ -16,8 +16,15 @@ public class CreateShortUrlCommandValidator : AbstractValidator<CreateShortUrlCo
     {
         _ = RuleFor(v => v.Url)
           .NotEmpty()
-          .WithMessage("Url is required.");
+          .Must(BeAValidUrl)
+          .WithMessage("Valid URL is required.");
     }
+
+    private bool BeAValidUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out _);
+    }
+
 }
 
 public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlCommand, string>
