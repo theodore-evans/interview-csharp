@@ -10,12 +10,21 @@ public record CreateShortUrlCommand : IRequest<string>
     public string Url { get; init; } = default!;
 }
 
-public class CreateShortUrlCommandValidator : AbstractValidator<CreateShortUrlCommand>
+public class CreateShortUrlCommandEmptyStringValidator : AbstractValidator<CreateShortUrlCommand>
 {
-    public CreateShortUrlCommandValidator()
+    public CreateShortUrlCommandEmptyStringValidator()
     {
         _ = RuleFor(v => v.Url)
           .NotEmpty()
+          .WithMessage("Non empty string required.");
+    }
+}
+
+public class CreateShortUrlCommandValidUrlValidator : AbstractValidator<CreateShortUrlCommand>
+{
+    public CreateShortUrlCommandValidUrlValidator()
+    {
+        _ = RuleFor(v => v.Url)
           .Must(BeAValidUrl)
           .WithMessage("Valid URL is required.");
     }
@@ -41,6 +50,17 @@ public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlComman
     public async Task<string> Handle(CreateShortUrlCommand request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        throw new NotImplementedException();
+
+        var urlEntity = new Domain.Entities.Url
+        {
+            OriginalUrl = request.Url
+        };
+
+        _ = _context.Urls.Add(urlEntity);
+        _ = await _context.SaveChangesAsync(cancellationToken);
+
+        var uniqueId = _hashids.EncodeLong(urlEntity.Id);
+
+        return uniqueId;
     }
 }
