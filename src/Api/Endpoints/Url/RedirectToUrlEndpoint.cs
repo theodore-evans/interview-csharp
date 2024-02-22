@@ -1,6 +1,7 @@
 using MediatR;
 using UrlShortenerService.Api.Endpoints.Url.Requests;
 using UrlShortenerService.Application.Url.Commands;
+using UrlShortenerService.Application.Common.Exceptions;
 
 using IMapper = AutoMapper.IMapper;
 
@@ -36,14 +37,20 @@ public class RedirectToUrlEndpoint : BaseEndpoint<RedirectToUrlRequest>
 
     public override async Task HandleAsync(RedirectToUrlRequest req, CancellationToken ct)
     {
-
-        var result = await Mediator.Send(
-        new RedirectToUrlCommand
+        try
         {
-            ShortenedUrl = req.shortenedUrl
-        },
-        ct
-        );
-        await SendRedirectAsync(result);
+            var result = await Mediator.Send(
+            new RedirectToUrlCommand
+            {
+                ShortenedUrl = req.shortenedUrl
+            },
+            ct
+            );
+            await SendRedirectAsync(result);
+        }
+        catch (NotFoundException)
+        {
+            await SendNotFoundAsync();
+        }
     }
 }
