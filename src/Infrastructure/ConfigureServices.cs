@@ -6,28 +6,31 @@ using Microsoft.Extensions.Configuration;
 using UrlShortenerService.Infrastructure.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
+// see: Entity Framework Core
+// EF Core postgres examples
+// ASPNET.core -- collection of .NET classes for web applications (Active Server Pages) cf. PHP
 
 public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        _ = services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 
         if (configuration.GetValue<bool>("UseInMemoryDatabase"))
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            _ = services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase("UrlShortenerServiceDb"));
         }
         else
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            _ = services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
         }
 
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        _ = services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-        services.AddScoped<ApplicationDbContextInitialiser>();
+        _ = services.AddScoped<ApplicationDbContextInitialiser>();
 
         _ = services.AddTransient<IDateTime, DateTimeService>();
 
