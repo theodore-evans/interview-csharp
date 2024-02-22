@@ -6,7 +6,7 @@ namespace UrlShortenerService.Api.Endpoints.Url.Requests;
 public class RedirectToUrlRequest
 {
     /// <summary>
-    /// The unique identifier of the shortened URL.
+    /// The shortened URL.
     /// </summary>
-    public string Id { get; set; } = default!;
+    public string shortenedUrl { get; set; } = default!;
 }
