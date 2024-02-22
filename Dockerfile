@@ -2,6 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /app
 
+# # In practice, built in Azure, this step generally not 
+# # part of Dockerfile
+# COPY *.csproj .
+# RUN dotnet restore
+
 # Copy the project files and build the release
 COPY . ./
 RUN dotnet publish -c Release -o out
